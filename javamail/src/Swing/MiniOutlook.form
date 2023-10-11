@@ -8,7 +8,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <tabbedpane id="91987" binding="tabbedPane1" default-binding="true">
+      <tabbedpane id="91987" binding="menu">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="800" height="600"/>
@@ -41,15 +41,17 @@
                   <text value="Objet"/>
                 </properties>
               </component>
-              <component id="10e4c" class="javax.swing.JTextPane" binding="textPane1" default-binding="true">
+              <component id="10e4c" class="javax.swing.JTextPane" binding="texte">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="50"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <text value=""/>
+                </properties>
               </component>
-              <component id="9d3d" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+              <component id="9d3d" class="javax.swing.JTextField" binding="destinataire">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -57,7 +59,7 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="44b5e" class="javax.swing.JTextField" binding="textField2" default-binding="true">
+              <component id="44b5e" class="javax.swing.JTextField" binding="objet">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
