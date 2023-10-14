@@ -12,6 +12,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
     private JTextField objet;
     private JButton ajouterUnePièceJointeButton;
     private JButton envoyerButton;
+    private JButton actualiserButton;
 
     public MiniOutlook() {
         panel1.setVisible(true);
