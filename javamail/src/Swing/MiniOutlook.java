@@ -30,7 +30,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
 
         ajouterUnePièceJointeButton.addActionListener(this);
         envoyerButton.addActionListener(this);
-
+        actualiserButton.addActionListener(this);
         // configurer la liaison avec le smails
 
 
@@ -50,6 +50,10 @@ public class MiniOutlook extends JFrame implements ActionListener {
         {
             envoyer();
         }
+        if(e.getSource()==actualiserButton)
+        {
+            recevoir();
+        }
     }
     public void ajouterPieceJointe() {
         System.out.println("hello piece jointe");
@@ -68,6 +72,9 @@ public class MiniOutlook extends JFrame implements ActionListener {
     }
     public void envoyer() {
         Erreur.setText(controller.getInstance().Envoyer(destinataire.getText(),objet.getText(),texte.getText(),lien));
+    }
+    public void  recevoir(){
+        controller.getInstance().Recevoir();
     }
 
 }

@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.mail.*;
 
 
+import java.io.IOException;
 import java.util.Properties;
 
 
@@ -43,7 +44,7 @@ public class controller {
                 mainVue = new MiniOutlook();
                 password = mdp;
                 username = mail;
-                return "corect" ;
+                return "correct" ;
             }
             else
             {
@@ -78,22 +79,28 @@ public class controller {
             try {
                 MimeMessage message = new MimeMessage(session);
                 message.setSubject(objet);
-                message.setText(text);
                 message.setFrom(new InternetAddress(username));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinataire));
 
-
-
                 if (lien != null ) {
+                    Multipart multipart = new MimeMultipart();
+                    MimeBodyPart mbp =  new MimeBodyPart();
+                    mbp.setText(text);
+                    multipart.addBodyPart(mbp);
+
+                    //boucler le petit bout de code ci dessous pour en envoyer plusioeurs pj
+                    //necessite un tab de pj dans le controlleur
                     MimeBodyPart pieceJointe = new MimeBodyPart();
                     FileDataSource source = new FileDataSource(lien);
                     pieceJointe.setDataHandler(new DataHandler(source));
                     pieceJointe.setFileName(source.getFile().getName());
-
-                    Multipart multipart = new MimeMultipart();
                     multipart.addBodyPart(pieceJointe);
 
+
                     message.setContent(multipart);
+                }
+                else {
+                    message.setText(text);
                 }
 
                 Transport.send(message);
@@ -122,6 +129,48 @@ public class controller {
             return "";
         }
 
+    public void Recevoir()
+    {
+        Properties props = new Properties();
+        props.put("mail.store.protocol", "pop3");
+        props.put("mail.pop3.host", "pop.gmail.com");
+        props.put("file.encoding","iso8859-1");
+        props.put("mail.pop3.port", "995");
 
+        Session session = javax.mail.Session.getDefaultInstance(props);
+        try {
+            Store store = session.getStore("pop3s");
+            store.connect("pop.gmail.com",username,password);
+            Folder f = store.getFolder("INBOX") ;
+            f.open(Folder.READ_ONLY);
+            Message msgList[] = f.getMessages() ;
+            for(Message m : msgList)
+            {
+
+                System.out.println("Expéditeur : " + m.getFrom()[0]);
+                System.out.println("Sujet : " + m.getSubject());
+                if(m.isMimeType("multipart/*"))
+                {
+                    if(m.isMimeType("text/plain"))
+                    {
+                        System.out.println("text : " + m.getContent().toString())
+                    }
+                }else
+                {
+                    System.out.println("text : " + m.getContent().toString());
+                }
+
+            }
+
+
+        } catch (NoSuchProviderException e) {
+            System.out.println(" erreur provider ");
+        } catch (MessagingException e) {
+            System.out.println("erreur messaging  " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 }

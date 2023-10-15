@@ -16,6 +16,8 @@ public class Connect extends JFrame implements ActionListener {
 
     public Connect() {
 
+        email.setText("cedricromain577@gmail.com");
+
         setContentPane(Panel);
         Panel.setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
