@@ -1,5 +1,7 @@
 package Swing;
 
+import Controller.controller;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +15,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
     private JButton ajouterUnePièceJointeButton;
     private JButton envoyerButton;
     private JButton actualiserButton;
+    private JLabel Erreur;
 
     private String lien ;
 
@@ -64,11 +67,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
         }
     }
     public void envoyer() {
-        System.out.println("test d'envois");
-        System.out.println("destinataire = "+ destinataire.getText());
-        System.out.println("objet = "+ objet.getText());
-        System.out.println("text = "+ texte.getText());
-
+        Erreur.setText(controller.getInstance().Envoyer(destinataire.getText(),objet.getText(),texte.getText(),lien));
         // ici que on va utiliser le systeme  mail et envoyer
         // pas oublier de reset les champs
     }
