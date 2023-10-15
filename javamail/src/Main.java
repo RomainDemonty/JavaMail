@@ -1,11 +1,10 @@
+import Controller.controller;
 import Swing.Connect;
 import Swing.MiniOutlook;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
-
-        Connect CO = new Connect();
-        CO.setVisible(true);
+        controller.getInstance();
+        System.out.println(controller.getInstance());
     }
 }

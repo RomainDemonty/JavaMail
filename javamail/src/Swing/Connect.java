@@ -1,5 +1,7 @@
 package Swing;
 
+import Controller.controller;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,12 +15,16 @@ public class Connect extends JFrame implements ActionListener {
     private JLabel Erreur;
 
     public Connect() {
+
         setContentPane(Panel);
         Panel.setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Connexion");
         setSize(600,400);
         seConnecterButton.addActionListener(this);
+
+        this.setVisible(true);
+
     }
 
     @Override
@@ -28,23 +34,9 @@ public class Connect extends JFrame implements ActionListener {
             seConnecter();
         }
     }
-
-    public void seConnecter(){
-        if(email.getText().equals("CedricRomain577@gmail.com"))
-        {
-            if(mdp.getText().equals("lgltdzyyadcqnbpe") || mdp.getText().equals("sozmoxmiamrfqzih"))
-            {
-                Erreur.setText("corect");
-                MiniOutlook min = new MiniOutlook();
-                min.setVisible(true);
-            }
-            else
-            {
-                Erreur.setText("mot de passe incorect");
-            }
-        }
-        else{
-            Erreur.setText("email incorect");
-        }
+    public void seConnecter()
+    {
+        Erreur.setText(controller.getInstance().Connexion(email.getText(),mdp.getText()));
     }
+
 }
