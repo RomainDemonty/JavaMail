@@ -68,8 +68,6 @@ public class MiniOutlook extends JFrame implements ActionListener {
     }
     public void envoyer() {
         Erreur.setText(controller.getInstance().Envoyer(destinataire.getText(),objet.getText(),texte.getText(),lien));
-        // ici que on va utiliser le systeme  mail et envoyer
-        // pas oublier de reset les champs
     }
 
 }
