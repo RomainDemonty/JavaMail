@@ -140,7 +140,6 @@ public class MiniOutlook extends JFrame implements ActionListener {
             jrd.addActionListener(this);
 
         }
-        headermail.setText("aaaaaaaaaaaaaaaa");
     }
 
     public void ouvrirMail( JRadioButton e ) throws MessagingException, IOException {
