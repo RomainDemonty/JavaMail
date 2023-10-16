@@ -72,6 +72,14 @@ public class MiniOutlook extends JFrame implements ActionListener {
     }
     public void envoyer() {
         Erreur.setText(controller.getInstance().Envoyer(destinataire.getText(),objet.getText(),texte.getText(),lien));
+        if(Erreur.getText()=="")
+        {
+            objet.setText("");
+            texte.setText("");
+            destinataire.setText("");
+            lien=null;
+        }
+
     }
     public void  recevoir(){
         controller.getInstance().Recevoir();

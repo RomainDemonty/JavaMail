@@ -2,6 +2,7 @@ package Controller;
 
 import Swing.Connect;
 import Swing.MiniOutlook;
+import model.ThreadNotif;
 
 import javax.activation.*;
 import javax.mail.internet.*;
@@ -9,7 +10,10 @@ import javax.swing.*;
 import javax.mail.*;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 
@@ -44,6 +48,8 @@ public class controller {
                 mainVue = new MiniOutlook();
                 password = mdp;
                 username = mail;
+                ThreadNotif thn= new ThreadNotif(username,password,15000) ;
+                thn.start();
                 return "correct" ;
             }
             else
@@ -144,25 +150,44 @@ public class controller {
             Folder f = store.getFolder("INBOX") ;
             f.open(Folder.READ_ONLY);
             Message msgList[] = f.getMessages() ;
+            Multipart mp ;
+            int length = f.getMessages().length;
+            System.out.println(length);
             for(Message m : msgList)
             {
-
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 System.out.println("Expéditeur : " + m.getFrom()[0]);
                 System.out.println("Sujet : " + m.getSubject());
-                if(m.isMimeType("multipart/*"))
-                {
-                    if(m.isMimeType("text/plain"))
-                    {
-                        System.out.println("text : " + m.getContent().toString())
+                if (m.isMimeType("multipart/*")) {
+                    mp = (Multipart) m.getContent();
+                    for (int i = 0; i < mp.getCount(); i++) {
+
+                        Part p = mp.getBodyPart(i);
+
+                        if (p.isMimeType("text/plain")) {
+                            System.out.println("text : " + p.getContent().toString());
+                        } else {
+                            if (p.getDisposition() != null && p.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+                                InputStream is = p.getInputStream();
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                int c;
+                                while ((c = is.read()) != -1) {
+                                    baos.write(c);
+                                }
+                                baos.flush();
+                                String nf = p.getFileName();
+                                FileOutputStream fos = new FileOutputStream(nf);
+                                baos.writeTo(fos);
+                                fos.close();
+                                System.out.println("Pièce attachée " + nf + " récupérée");
+                            }
+
+                        }
                     }
-                }else
-                {
-                    System.out.println("text : " + m.getContent().toString());
+                }else {
+                        System.out.println("text : " + m.getContent().toString());
+                    }
                 }
-
-            }
-
-
         } catch (NoSuchProviderException e) {
             System.out.println(" erreur provider ");
         } catch (MessagingException e) {
@@ -171,6 +196,12 @@ public class controller {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    public void notifier()
+    {
+           JOptionPane.showMessageDialog(null, "Vous avez de nouveau(x) mail(s)", "Notification", JOptionPane.INFORMATION_MESSAGE);
     }
 
 }
