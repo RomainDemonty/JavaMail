@@ -2,6 +2,7 @@ package Swing;
 
 import Controller.controller;
 
+import javax.mail.MessagingException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -33,11 +34,14 @@ public class Connect extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==seConnecterButton)
         {
-            seConnecter();
+            try {
+                seConnecter();
+            } catch (MessagingException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
-    public void seConnecter()
-    {
+    public void seConnecter() throws MessagingException {
         Erreur.setText(controller.getInstance().Connexion(email.getText(),mdp.getText()));
     }
 

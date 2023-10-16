@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Properties;
 
 
@@ -26,7 +27,9 @@ public class controller {
     {
         return instance ;
     }
-    private JFrame mainVue ;
+    public JFrame mainVue ;
+
+    private ArrayList<Message> listMsg ;
 
     // Paramètres de connexion au serveur SMTP
     private String smtpServeur = "smtp.gmail.com";
@@ -37,19 +40,22 @@ public class controller {
 
     private controller (){
          mainVue = new Connect();
+        listMsg = new ArrayList<Message>();
     }
 
-    public String Connexion(String mail , String mdp){
+    public String Connexion(String mail , String mdp) throws MessagingException {
         if(mail.equals("cedricromain577@gmail.com"))
         {
             if(mdp.equals("lgltdzyyadcqnbpe") || mdp.equals("ulfkcbjrzwftkfwt"))
             {
                 mainVue.dispose();
-                mainVue = new MiniOutlook();
+
                 password = mdp;
                 username = mail;
-                ThreadNotif thn= new ThreadNotif(username,password,15000) ;
+                ThreadNotif thn= new ThreadNotif(username,password,10000) ;
                 thn.start();
+                Recevoir();
+                mainVue = new MiniOutlook();
                 return "correct" ;
             }
             else
@@ -63,7 +69,7 @@ public class controller {
     }
 
     public String Envoyer(String destinataire , String objet , String text , String lien){
-        if(destinataire == null)
+        if(destinataire == "")
         {
             return "Le destinataire ne peut pas être vide !";
         }
@@ -94,14 +100,11 @@ public class controller {
                     mbp.setText(text);
                     multipart.addBodyPart(mbp);
 
-                    //boucler le petit bout de code ci dessous pour en envoyer plusioeurs pj
-                    //necessite un tab de pj dans le controlleur
                     MimeBodyPart pieceJointe = new MimeBodyPart();
                     FileDataSource source = new FileDataSource(lien);
                     pieceJointe.setDataHandler(new DataHandler(source));
                     pieceJointe.setFileName(source.getFile().getName());
                     multipart.addBodyPart(pieceJointe);
-
 
                     message.setContent(multipart);
                 }
@@ -111,7 +114,7 @@ public class controller {
 
                 Transport.send(message);
 
-                System.out.println("E-mail envoyé avec succès !");
+                return "E-mail envoyé avec succès !";
             } catch (MessagingException e) {
                 e.printStackTrace();
             }
@@ -132,34 +135,37 @@ public class controller {
                 System.out.println("text = "+ text);
                 System.out.println("Chemin d'accès au fichier sélectionné : " + lien);
             }
-            return "";
+              return " "    ;
         }
 
     public void Recevoir()
     {
+        listMsg.clear();
         Properties props = new Properties();
-        props.put("mail.store.protocol", "pop3");
-        props.put("mail.pop3.host", "pop.gmail.com");
+        props.put("mail.store.protocol", "imaps" );
+        props.put("mail.imap.host", "imap.gmail.com");
         props.put("file.encoding","iso8859-1");
-        props.put("mail.pop3.port", "995");
+
 
         Session session = javax.mail.Session.getDefaultInstance(props);
         try {
-            Store store = session.getStore("pop3s");
-            store.connect("pop.gmail.com",username,password);
+            Store store = session.getStore("imaps");
+            store.connect("imap.gmail.com",username,password);
             Folder f = store.getFolder("INBOX") ;
             f.open(Folder.READ_ONLY);
             Message msgList[] = f.getMessages() ;
             Multipart mp ;
-            int length = f.getMessages().length;
-            System.out.println(length);
+
             for(Message m : msgList)
             {
+                listMsg.add(m);
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 System.out.println("Expéditeur : " + m.getFrom()[0]);
                 System.out.println("Sujet : " + m.getSubject());
+                       
                 if (m.isMimeType("multipart/*")) {
                     mp = (Multipart) m.getContent();
+
                     for (int i = 0; i < mp.getCount(); i++) {
 
                         Part p = mp.getBodyPart(i);
@@ -176,12 +182,11 @@ public class controller {
                                 }
                                 baos.flush();
                                 String nf = p.getFileName();
-                                FileOutputStream fos = new FileOutputStream(nf);
+                                FileOutputStream fos = new FileOutputStream("./Image/"+nf);
                                 baos.writeTo(fos);
                                 fos.close();
                                 System.out.println("Pièce attachée " + nf + " récupérée");
                             }
-
                         }
                     }
                 }else {
@@ -204,4 +209,7 @@ public class controller {
            JOptionPane.showMessageDialog(null, "Vous avez de nouveau(x) mail(s)", "Notification", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public java.util.ArrayList<Message> getListMsg() {
+        return listMsg;
+    }
 }

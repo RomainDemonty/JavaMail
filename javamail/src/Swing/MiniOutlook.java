@@ -2,9 +2,17 @@ package Swing;
 
 import Controller.controller;
 
+import javax.mail.*;
 import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
 
 public class MiniOutlook extends JFrame implements ActionListener {
     private JTabbedPane menu;
@@ -16,13 +24,22 @@ public class MiniOutlook extends JFrame implements ActionListener {
     private JButton envoyerButton;
     private JButton actualiserButton;
     private JLabel Erreur;
+    private JScrollPane mailListScrollPane;
+    private JScrollPane mailScrollPane;
+    private JLabel mailfrom;
+    private JLabel mailsubject;
+    private JLabel mailTexte;
+    private JLabel pieceJointe;
+    private JLabel headermail;
+    private JPanel panelmail;
+    private JPanel maillistpanel;
 
     private String lien ;
 
+   private  ButtonGroup buttonGroup = new ButtonGroup();
 
+    public MiniOutlook() throws MessagingException {
 
-    public MiniOutlook() {
-        panel1.setVisible(true);
         setContentPane(panel1);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("MiniOutlook");
@@ -34,8 +51,20 @@ public class MiniOutlook extends JFrame implements ActionListener {
         // configurer la liaison avec le smails
 
 
+        maillistpanel.setLayout(new GridLayout(0,1));
+        for( int i = 0 ; i < controller.getInstance().getListMsg().size() ; i++)
+        {
+            Message m = controller.getInstance().getListMsg().get(i);
+           JRadioButton jrb= new JRadioButton("<html> FROM : " + m.getFrom()[0].toString() +"<br>" +
+                    "Subject : " +  m.getSubject() + "</html>");
+           jrb.addActionListener(this);
+            maillistpanel.add(jrb);
+            buttonGroup.add((jrb));
+        }
+        mailListScrollPane.setViewportView(maillistpanel);
 
 
+        panel1.setVisible(true);
         setVisible(true);
     }
 
@@ -52,8 +81,24 @@ public class MiniOutlook extends JFrame implements ActionListener {
         }
         if(e.getSource()==actualiserButton)
         {
-            recevoir();
+            try {
+                recevoir();
+            } catch (MessagingException ex) {
+                throw new RuntimeException(ex);
+            }
         }
+        if(e.getSource() instanceof JRadioButton)
+        {
+            try {
+                ouvrirMail((JRadioButton) e.getSource());
+            } catch (MessagingException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        this.getContentPane().repaint();
+        this.getContentPane().revalidate();
     }
     public void ajouterPieceJointe() {
         System.out.println("hello piece jointe");
@@ -72,7 +117,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
     }
     public void envoyer() {
         Erreur.setText(controller.getInstance().Envoyer(destinataire.getText(),objet.getText(),texte.getText(),lien));
-        if(Erreur.getText()=="")
+        if(Erreur.getText()=="E-mail envoyé avec succès !")
         {
             objet.setText("");
             texte.setText("");
@@ -81,9 +126,76 @@ public class MiniOutlook extends JFrame implements ActionListener {
         }
 
     }
-    public void  recevoir(){
+    public void  recevoir() throws MessagingException {
+        int tmp = controller.getInstance().getListMsg().size();
+
         controller.getInstance().Recevoir();
+
+        maillistpanel.removeAll();
+        for (int i = 0; i < controller.getInstance().getListMsg().size(); i++) {
+            Message m = controller.getInstance().getListMsg().get(i);
+            JRadioButton jrd = new JRadioButton("<html> FROM : " + m.getFrom()[0].toString() + "<br>" +  "Subject : " + m.getSubject() + "</html>");
+            maillistpanel.add(jrd);
+            buttonGroup.add(jrd);
+            jrd.addActionListener(this);
+
+        }
+        headermail.setText("aaaaaaaaaaaaaaaa");
     }
+
+    public void ouvrirMail( JRadioButton e ) throws MessagingException, IOException {
+       JPanel jlist = (JPanel) mailListScrollPane.getViewport().getComponent(0);
+        pieceJointe.setText("");
+        headermail.setText("<html>");
+        Multipart mp ;
+        for (int i = 0 ; i<controller.getInstance().getListMsg().size();i++)
+        {
+            Message m = controller.getInstance().getListMsg().get(i);
+            if (e.equals( jlist.getComponent(i)) )
+            {
+                System.out.println(e.getText());
+                mailfrom.setText ("Expediteur : " +  m.getFrom()[0].toString());
+               mailsubject.setText ("Objet : " + m.getSubject().toString());
+
+                if (m.isMimeType("multipart/*")) {
+                    mp = (Multipart) m.getContent();
+
+                    for (int k = 0; k < mp.getCount(); k++) {
+
+                        Part p = mp.getBodyPart(k);
+
+
+                        if (p.isMimeType("text/plain")) {
+                            mailTexte.setText ("text : " + p.getContent().toString());
+                        } else {
+                            if (p.getDisposition() != null && p.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+
+                               pieceJointe.setText (pieceJointe.getText()+ "Piece Jointe : " + p.getFileName());
+                            }
+                        }
+                    }
+                }else {
+                    mailTexte.setText ("text   : " + m.getContent().toString());
+                }
+
+                Enumeration en = m.getAllHeaders();
+
+                while (en.hasMoreElements())
+                {
+                    Header h = (Header)en.nextElement();
+                    headermail.setText( headermail.getText() + "\n" +   h.getName() + " -- >" + h.getValue()+"<br>" );
+
+
+                }
+                headermail.setText(headermail.getText()+"</html>");
+            }
+
+
+        }
+
+
+    }
+
 
 }
 

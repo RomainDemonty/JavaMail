@@ -7,7 +7,7 @@ import javax.mail.*;
 import java.util.Properties;
 
 public class ThreadNotif extends Thread {
-    private MiniOutlook miniOutlook;
+
     private int time;
     private int currentsize;
     private String username ;
@@ -40,19 +40,16 @@ public class ThreadNotif extends Thread {
 
     private int actualiser() {
         Properties props = new Properties();
-        props.put("mail.store.protocol", "pop3");
-        props.put("mail.pop3.host", "pop.gmail.com");
+        props.put("mail.store.protocol", "imaps");
+        props.put("mail.imap.host", "imap.gmail.com");
         props.put("file.encoding", "iso8859-1");
-        props.put("mail.pop3.port", "995");
 
         Session session = javax.mail.Session.getDefaultInstance(props);
         try {
-            Store store = session.getStore("pop3s");
-            store.connect("pop.gmail.com", username, password);
+            Store store = session.getStore("imaps");
+            store.connect("imap.gmail.com", username, password);
             Folder f = store.getFolder("INBOX");
             f.open(Folder.READ_ONLY);
-            Message msgList[] = f.getMessages();
-            Multipart mp;
             int taille = f.getMessages().length;
             return taille ;
 
