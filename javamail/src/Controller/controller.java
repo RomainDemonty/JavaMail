@@ -46,7 +46,7 @@ public class controller {
     public String Connexion(String mail , String mdp) throws MessagingException {
         if(mail.equals("cedricromain577@gmail.com"))
         {
-            if(mdp.equals("lgltdzyyadcqnbpe") || mdp.equals("ulfkcbjrzwftkfwt") || mdp.equals("knlxrvuwkvoxuqgq"))
+            if(mdp.equals("lgltdzyyadcqnbpe") || mdp.equals("ulfkcbjrzwftkfwt") || mdp.equals("knlxrvuwkvoxuqgq")||mdp.equals("sntskocnksdnljbq"))
             {
                 mainVue.dispose();
 
