@@ -4,15 +4,15 @@ import Controller.controller;
 
 import javax.mail.*;
 import javax.swing.*;
-import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Enumeration;
+
+import static jdk.jfr.consumer.EventStream.openFile;
 
 public class MiniOutlook extends JFrame implements ActionListener {
     private JTabbedPane menu;
@@ -33,10 +33,13 @@ public class MiniOutlook extends JFrame implements ActionListener {
     private JLabel headermail;
     private JPanel panelmail;
     private JPanel maillistpanel;
+    private JButton Ouvrir;
 
     private String lien ;
 
    private  ButtonGroup buttonGroup = new ButtonGroup();
+
+   private String selectedFileName ;
 
     public MiniOutlook() throws MessagingException {
 
@@ -44,10 +47,12 @@ public class MiniOutlook extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("MiniOutlook");
         setSize(800,600);
+        Ouvrir.setVisible(false);
 
         ajouterUnePièceJointeButton.addActionListener(this);
         envoyerButton.addActionListener(this);
         actualiserButton.addActionListener(this);
+        Ouvrir.addActionListener(this);
         // configurer la liaison avec le smails
 
 
@@ -97,6 +102,11 @@ public class MiniOutlook extends JFrame implements ActionListener {
                 throw new RuntimeException(ex);
             }
         }
+        if(e.getSource() ==  Ouvrir)
+        {
+            openFile(selectedFileName);
+        }
+
         this.getContentPane().repaint();
         this.getContentPane().revalidate();
     }
@@ -147,6 +157,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
         pieceJointe.setText("");
         headermail.setText("<html>");
         Multipart mp ;
+        Ouvrir.setVisible(false);
         for (int i = 0 ; i<controller.getInstance().getListMsg().size();i++)
         {
             Message m = controller.getInstance().getListMsg().get(i);
@@ -170,6 +181,9 @@ public class MiniOutlook extends JFrame implements ActionListener {
                             if (p.getDisposition() != null && p.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
 
                                pieceJointe.setText (pieceJointe.getText()+ "Piece Jointe : " + p.getFileName());
+                               selectedFileName = p.getFileName();
+                               System.out.println(selectedFileName);
+                               Ouvrir.setVisible(true);
                             }
                         }
                     }
@@ -183,8 +197,6 @@ public class MiniOutlook extends JFrame implements ActionListener {
                 {
                     Header h = (Header)en.nextElement();
                     headermail.setText( headermail.getText() + "\n" +   h.getName() + " -- >" + h.getValue()+"<br>" );
-
-
                 }
                 headermail.setText(headermail.getText()+"</html>");
             }
@@ -193,6 +205,22 @@ public class MiniOutlook extends JFrame implements ActionListener {
         }
 
 
+    }
+
+    private void openFile(String fileName) {
+        String projectRoot = System.getProperty("user.dir")+ "\\Image";
+        System.out.println(projectRoot);
+        File file = new File(projectRoot, fileName);
+
+        if (file.exists()) {
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Fichier introuvable : " + fileName);
+        }
     }
 
 
