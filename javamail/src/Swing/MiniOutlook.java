@@ -34,6 +34,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
     private JPanel panelmail;
     private JPanel maillistpanel;
     private JButton Ouvrir;
+    private JLabel nomPJ;
 
     private String lien ;
 
@@ -121,6 +122,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
             // Récupère le chemin d'accès au fichier sélectionné
             lien = fileChooser.getSelectedFile().getAbsolutePath();
             System.out.println("Chemin d'accès au fichier sélectionné : " + lien);
+            nomPJ.setText(lien);
         } else {
             System.out.println("Aucun fichier sélectionné.");
         }
@@ -132,6 +134,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
             objet.setText("");
             texte.setText("");
             destinataire.setText("");
+            nomPJ.setText("");
             lien=null;
         }
 
@@ -155,6 +158,7 @@ public class MiniOutlook extends JFrame implements ActionListener {
     public void ouvrirMail( JRadioButton e ) throws MessagingException, IOException {
        JPanel jlist = (JPanel) mailListScrollPane.getViewport().getComponent(0);
         pieceJointe.setText("");
+        mailTexte.setText("");
         headermail.setText("<html>");
         Multipart mp ;
         Ouvrir.setVisible(false);

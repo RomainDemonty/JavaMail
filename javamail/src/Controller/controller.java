@@ -31,7 +31,6 @@ public class controller {
 
     private ArrayList<Message> listMsg ;
 
-    // Paramètres de connexion au serveur SMTP
     private String smtpServeur = "smtp.gmail.com";
     private String smtpPort = "587" ;
     private  String username;
@@ -89,7 +88,7 @@ public class controller {
             });
 
             try {
-                MimeMessage message = new MimeMessage(session);
+               MimeMessage message = new MimeMessage(session);
                 message.setSubject(objet);
                 message.setFrom(new InternetAddress(username));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinataire));
